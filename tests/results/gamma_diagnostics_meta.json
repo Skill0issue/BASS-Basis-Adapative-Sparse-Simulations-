@@ -1,0 +1,19 @@
+{
+  "N_values": [
+    14,
+    16,
+    18,
+    20
+  ],
+  "K_values": [
+    512,
+    1024,
+    2048,
+    4096
+  ],
+  "n_trials": 50,
+  "seed_base": 42,
+  "bass_kw": {
+    "use_2qubit_rotations": true
+  }
+}

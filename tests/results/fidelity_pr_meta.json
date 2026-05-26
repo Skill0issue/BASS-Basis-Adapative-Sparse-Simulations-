@@ -1,0 +1,25 @@
+{
+  "N": 20,
+  "n_trials": 100,
+  "seed_base": 20260520,
+  "k_values": [
+    100,
+    200,
+    500,
+    1000,
+    2000,
+    5000,
+    10000,
+    20000,
+    50000
+  ],
+  "family_keys": [
+    "brickwork_2d",
+    "brickwork",
+    "rfim"
+  ],
+  "bass_kw": {
+    "optimize_every": 5,
+    "buffer_factor": 1
+  }
+}

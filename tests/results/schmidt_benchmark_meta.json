@@ -1,0 +1,18 @@
+{
+  "N": 16,
+  "K": 8192,
+  "n_trials": 100,
+  "seed_base": 20260520,
+  "circuits": [
+    "haar_L3",
+    "haar_L5",
+    "brickwork_L3",
+    "brickwork_L5"
+  ],
+  "methods": [
+    "top-k",
+    "random-k",
+    "schmidt-1cut",
+    "schmidt-3cut"
+  ]
+}

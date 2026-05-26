@@ -1,0 +1,13 @@
+# Benchmark outputs
+# tests/results/
+# tests/figures/
+
+
+# Python cache
+__pycache__/
+
+# Package init files
+__init__.py
+
+# Virtual environments
+venv/

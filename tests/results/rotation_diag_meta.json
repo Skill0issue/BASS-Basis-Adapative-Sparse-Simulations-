@@ -1,0 +1,11 @@
+{
+  "N": 12,
+  "n_trials": 100,
+  "seed_base": 20260520,
+  "family_keys": [
+    "tfim",
+    "rfim",
+    "brickwork_1d",
+    "brickwork_2d"
+  ]
+}

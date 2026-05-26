@@ -1,0 +1,14 @@
+{
+  "N": 16,
+  "K": 4096,
+  "trials": 20,
+  "seed": 0,
+  "families": [
+    "RFIM (W=2)",
+    "Brickwork 1D",
+    "Brickwork 2D",
+    "Haar L=3",
+    "QAOA p=3",
+    "UCCSD L=1"
+  ]
+}
