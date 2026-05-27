@@ -462,10 +462,13 @@ The theoretical foundation and benchmarking methodology of BASS build upon key l
 If you find this framework useful in your research, please cite our paper:
 
 ```bibtex
-@article{bass2026,
-  title={Basis-Adaptive Sparse-State Simulation of Quantum Circuits},
-  author={Kartikeya, Ch Nihar and K, Anjana and Sarma, Bijita and Borah, Sangkha},
-  journal={arXiv preprint},
-  year={2026}
+@misc{kartikeya2026bass,
+      title={Basis-Adaptive Sparse-State Simulation of Quantum Circuits}, 
+      author={Ch Nihar Kartikeya and Anjana K and Bijita Sarma and Sangkha Borah},
+      year={2026},
+      eprint={2605.27285},
+      archivePrefix={arXiv},
+      primaryClass={quant-ph},
+      url={https://arxiv.org/abs/2605.27285}, 
 }
 ```
