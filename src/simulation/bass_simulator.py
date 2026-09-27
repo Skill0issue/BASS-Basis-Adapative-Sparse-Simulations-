@@ -725,9 +725,14 @@ class BASS:
                 state.nnz = nnz_save
             else:
                 # track probability lost through both truncations
-                self._gamma_running *= np.sqrt(frac1 * frac2)
+                # BUG FIX (was np.sqrt(frac1*frac2)): same as _optimize_basis.
+                self._gamma_running *= frac1 * frac2
 
     def _optimize_basis(self, state):
+        # Early-exit guard: if the state is already well-concentrated
+        # (PR < k/4), basis optimization is unlikely to help and the overhead
+        # is wasted.  This is not shown in Algorithm 2 of the paper and should
+        # be added to the pseudocode description in Sec V D.
         if self._pr(state) < self.k / 4:
             return
 
@@ -806,9 +811,11 @@ class BASS:
                     pr = pr_new
 
                     # Multiply the running gamma by the retained mass
-                    self._gamma_running *= np.sqrt(
-                        frac_retained if frac_retained > 1e-30 else 0
-                    )
+                    # BUG FIX (was np.sqrt(frac)): gamma² = ∏ frac_i requires
+                    # multiplying by frac, not sqrt(frac).  sqrt(frac) > frac for
+                    # 0 < frac < 1, so the old code overestimated gamma, potentially
+                    # violating the lower-bound property (gamma² ≤ F).
+                    self._gamma_running *= frac_retained if frac_retained > 1e-30 else 0
 
                     self._invalidate_kron(j)
                     improved_this_pass = True

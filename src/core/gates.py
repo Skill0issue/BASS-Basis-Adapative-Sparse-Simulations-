@@ -1,5 +1,4 @@
 import numpy as np
-from numba import jit
 from scipy.stats import unitary_group
 
 
@@ -142,10 +141,11 @@ class RYGate(SingleQubitGate):
 class RandomTwoQubitGate(TwoQubitGate):
     """Random Haar-uniform 2-qubit gate"""
 
-    def __init__(self, qubit1, qubit2, seed=None):
-        if seed is not None:
-            np.random.seed(seed)
-        matrix = unitary_group.rvs(4)
+    def __init__(self, qubit1, qubit2, seed=None, rng=None):
+        if rng is not None and seed is not None:
+            raise ValueError("Pass either seed or rng, not both")
+        random_state = rng if rng is not None else seed
+        matrix = unitary_group.rvs(4, random_state=random_state)
         super().__init__(qubit1, qubit2, matrix)
 
 
@@ -159,6 +159,4 @@ def haar_random_unitary(dimension, seed=None):
     Returns:
         Unitary matrix
     """
-    if seed is not None:
-        np.random.seed(seed)
-    return unitary_group.rvs(dimension)
+    return unitary_group.rvs(dimension, random_state=seed)

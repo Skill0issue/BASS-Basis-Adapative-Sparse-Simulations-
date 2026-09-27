@@ -175,15 +175,13 @@ class FixedBasisSimulator:
                     if self._truncate_name == "top-k":
                         top_idx = np.argpartition(probs, -self.k)[-self.k :]
                     else:  # random-k
-                        np.random.seed(current_seed)
                         probs_norm = (
                             probs / total
                             if total > 1e-30
                             else np.ones(state.nnz) / state.nnz
                         )
-                        top_idx = np.random.choice(
-                            state.nnz, size=self.k, replace=False, p=probs_norm
-                        )
+                        rng = np.random.default_rng(current_seed)
+                        top_idx = rng.choice(state.nnz, size=self.k, replace=False)
 
                     kept_prob = np.sum(probs[top_idx])
 

@@ -1,46 +1,44 @@
 """
 QuantumFidelityMetrics
 ======================
-Rigorous statistical analysis tools and validation metrics designed to evaluate state 
+Rigorous statistical analysis tools and validation metrics designed to evaluate state
 reconstruction precision, state sparsity, and tracking bounds for sparse simulation frameworks.
 
-This module provides the numerical tracking backend that evaluates the absolute fidelity 
-of approximate sparse vectors against dense statevector baselines, completely bypassing 
+This module provides the numerical tracking backend that evaluates the absolute fidelity
+of approximate sparse vectors against dense statevector baselines, completely bypassing
 historical normalization bugs.
 
 Mathematical Formulations & Metrics
 -----------------------------------
     1. Pristine State Vector Fidelity (`compute_fidelity`)
-        Computes the absolute squared overlap between an exact reference state |ψ_exact⟩ 
+        Computes the absolute squared overlap between an exact reference state |ψ_exact⟩
         and a truncated, sparse-state wave-front |φ_sparse⟩:
             f = | ⟨ψ_exact | φ_sparse⟩ |²
-        *Methodological Note:* Amplitudes (alpha) are strictly normalized at each internal 
-        truncation boundary (Convention B). The stored array coefficients represent the true physical 
-        amplitudes of the normalized sparse state. This completely avoids historical inflation bugs 
+        *Methodological Note:* Amplitudes (alpha) are strictly normalized at each internal
+        truncation boundary (Convention B). The stored array coefficients represent the true physical
+        amplitudes of the normalized sparse state. This completely avoids historical inflation bugs
         (dividing by γ), ensuring that measured values are mathematically bounded at f ≤ 1.0.
 
     2. Deterministic Fidelity Lower Bounds (`compute_fidelity_bounds`)
         Extracts active lower bounds without running an exponentially costly exact statevector inner product:
             f_lower = γ²
-        Where γ² represents the cumulative, running probability mass preserved throughout the entire 
+        Where γ² represents the cumulative, running probability mass preserved throughout the entire
         sequence of simulator budget enforcements.
 
     3. Inverse Participation Ratio / Sparsity Measure (`compute_participation_ratio`)
-        Quantifies the computational basis localization and state compression profile via the 
+        Quantifies the computational basis localization and state compression profile via the
         2nd-order Renyi entropy footprint:
             PR = 1 / ( Σ_{i=1}^nnz |α_i|⁴ )
-        A localized computational basis state yields PR = 1.0, while a perfectly uniform superposition 
-        over k states scales as PR = k. This metric acts as the vital cost function for BASS coordinate 
+        A localized computational basis state yields PR = 1.0, while a perfectly uniform superposition
+        over k states scales as PR = k. This metric acts as the vital cost function for BASS coordinate
         descent sweeps.
 
     4. Linear Cross-Entropy Benchmarking (`estimate_cross_entropy_fidelity`)
         Simulates experimental cross-entropy benchmarking (XEB) sequences via importance sampling:
             F_XEB = 2^N · ⟨ P_exact(x) ⟩_samples - 1
-        Draws physical bitstring configurations directly from the sparse state's active basis distribution 
+        Draws physical bitstring configurations directly from the sparse state's active basis distribution
         to reconstruct an unbiased statistical estimator of system fidelity.
 """
-
-
 
 import numpy as np
 
@@ -68,10 +66,12 @@ def compute_fidelity(sparse_state, exact_state):
 def compute_fidelity_bounds(sparse_state):
     """
     Compute fidelity bounds without exact state.
-    gamma² is a lower bound on fidelity (Eq. 8 of paper: f_bar >= gamma²).
+    gamma² is the simulator's cumulative retained-probability diagnostic.
+    Treat it as a certified lower bound only for code paths whose truncation
+    convention explicitly preserves that guarantee.
     """
     gamma_sq = sparse_state.gamma**2
-    f_lower = gamma_sq  # probability retained is a lower bound
+    f_lower = gamma_sq
     f_upper = 1.0
     return f_lower, f_upper
 
