@@ -57,7 +57,7 @@ import numpy as np
 from src.core.gates import RandomTwoQubitGate, RXGate, RZZGate, RZGate
 
 
-def generate_random_circuit(num_qubits, num_layers, gate_type="haar"):
+def generate_random_circuit(num_qubits, num_layers, gate_type="haar", rng=None):
     """
     Generate random quantum circuit as in Miller et al. paper
 
@@ -70,16 +70,32 @@ def generate_random_circuit(num_qubits, num_layers, gate_type="haar"):
         num_qubits: Number of qubits
         num_layers: Number of layers (L in paper)
         gate_type: 'haar' for Haar-random (default), 'clifford' for Clifford
+        rng: numpy.random.Generator instance (e.g. np.random.default_rng(seed)).
+            REQUIRED for reproducible circuits: every other circuit family in
+            this codebase (make_brickwork, make_rfim, make_qaoa, ...) derives
+            all randomness exclusively from an explicit `rng`, and this
+            function now follows the identical pattern -- the qubit pairing
+            uses `rng.shuffle` and each gate's Haar-random unitary is seeded
+            via `rng.integers(...)` (mirroring make_brickwork's
+            `RandomTwoQubitGate(..., seed=int(rng.integers(...)))` call).
+            If omitted, falls back to the legacy global `np.random` state;
+            this fallback is kept only for backward compatibility with any
+            pre-existing call site and should not be relied on for anything
+            that needs to be reproducible from a fixed seed.
 
     Returns:
         List of gates
     """
     circuit = []
+    use_generator = rng is not None
 
     for layer in range(num_layers):
         # Random pairing of qubits
         qubits = list(range(num_qubits))
-        np.random.shuffle(qubits)
+        if use_generator:
+            rng.shuffle(qubits)
+        else:
+            np.random.shuffle(qubits)
 
         # Apply gates to pairs
         num_pairs = num_qubits // 2
@@ -88,7 +104,10 @@ def generate_random_circuit(num_qubits, num_layers, gate_type="haar"):
             q2 = qubits[2 * i + 1]
 
             if gate_type == "haar":
-                gate = RandomTwoQubitGate(q1, q2)
+                if use_generator:
+                    gate = RandomTwoQubitGate(q1, q2, seed=int(rng.integers(0, 2**31)))
+                else:
+                    gate = RandomTwoQubitGate(q1, q2)
             else:
                 raise NotImplementedError(f"Gate type {gate_type} not implemented")
 

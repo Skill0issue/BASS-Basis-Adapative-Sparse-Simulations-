@@ -8,6 +8,8 @@ __pycache__/
 
 # Package init files
 __init__.py
+.nbi
+.nbc
 
 # Virtual environments
 venv/

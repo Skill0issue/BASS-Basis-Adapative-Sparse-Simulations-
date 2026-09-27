@@ -1,69 +1,6 @@
 import numpy as np
 from numba import njit, int64, uint64, complex128, float64, types
 
-# def top_k_truncate_kernel_opt(x, alpha, nnz, k):
-
-#     if nnz <= k:
-#         gamma_sq = 0.0
-#         for i in range(nnz):
-#             gamma_sq += alpha[i].real*alpha[i].real + alpha[i].imag*alpha[i].imag
-#         return nnz, gamma_sq
-
-#     # Compute magnitudes in-place in temporary buffer
-#     mags = np.empty(nnz, dtype=np.float64)
-#     for i in range(nnz):
-#         mags[i] = alpha[i].real*alpha[i].real + alpha[i].imag*alpha[i].imag
-
-#     # kth largest pivot
-#     kth = nnz - k
-#     idx = np.argpartition(mags, kth)[kth:]
-
-#     gamma_sq = 0.0
-
-#     # Copy directly while summing
-#     for j in range(k):
-#         i_sel = idx[j]
-#         gamma_sq += mags[i_sel]
-#         x[j] = x[i_sel]
-#         alpha[j] = alpha[i_sel]
-
-#     return k, gamma_sq
-
-# def random_k_truncate_kernel_opt(x, alpha, nnz, k, seed):
-
-#     if nnz <= k:
-#         gamma_sq = 0.0
-#         for i in range(nnz):
-#             gamma_sq += alpha[i].real*alpha[i].real + alpha[i].imag*alpha[i].imag
-#         return nnz, gamma_sq
-
-#     # Create index array
-#     perm = np.arange(nnz)
-
-#     # Deterministic LCG RNG
-#     rng = seed
-
-#     # Partial Fisher-Yates shuffle (only first k needed)
-#     for i in range(k):
-#         rng = (1103515245 * rng + 12345) & 0x7fffffff
-#         r = i + (rng % (nnz - i))
-
-#         # swap perm[i], perm[r]
-#         tmp = perm[i]
-#         perm[i] = perm[r]
-#         perm[r] = tmp
-
-#     gamma_sq = 0.0
-
-#     # Copy first k selected elements
-#     for j in range(k):
-#         idx = perm[j]
-#         x[j] = x[idx]
-#         alpha[j] = alpha[idx]
-#         gamma_sq += alpha[idx].real*alpha[idx].real + alpha[idx].imag*alpha[idx].imag
-
-#     return k, gamma_sq
-
 
 @njit(
     types.Tuple((int64, float64))(
@@ -95,7 +32,7 @@ def top_k_truncate_kernel_opt(x, alpha, nnz, k):
         gamma_sq += mags[idx[j]]
 
     # --- FIX: use temp buffers to avoid aliasing ---
-    # In the original code, doing x[j] = x[idx[j]] in-place can overwrite
+    # In the code, doing x[j] = x[idx[j]] in-place can overwrite
     # a source element before it's been read (when idx[j] < j), corrupting
     # amplitudes and breaking norm conservation across gates.
     temp_x = np.empty(k, dtype=np.uint64)
